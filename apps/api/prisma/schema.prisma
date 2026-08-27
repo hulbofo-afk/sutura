@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String               @id @default(uuid())
+  email             String               @unique
+  passwordHash      String
+  name              String
+  brandName         String
+  city              String?
+  country           String?
+  role              String               @default("creator")
+  status            String               @default("active")
+  sessionVersion    Int                  @default(0)
+  failedLoginCount  Int                  @default(0)
+  lockedUntil       DateTime?
+  emailVerified     Boolean              @default(false)
+  emailVerifiedAt   DateTime?
+  /// Legacy verification token column retained during the VPS baseline; never expose or write it.
+  emailVerifyToken   String?              @unique
+  pendingEmail      String?
+  emailVerifyTokenHash String?           @unique
+  emailVerifyExp    DateTime?
+  collections       Collection[]
+  resetTokens       PasswordResetToken[]
+  refreshTokens     RefreshToken[]
+  loginAttempts     LoginAttempt[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([role])
+  @@index([status])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String
+  ip        String
+  userAgent String?
+  success   Boolean
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([ip])
+  @@index([createdAt])
+}
+
+model Collection {
+  id             String         @id @default(uuid())
+  creatorId      String
+  creator        User           @relation(fields: [creatorId], references: [id])
+  title          String
+  description    String?
+  season         String?
+  category       String?
+  targetAudience String?
+  launchDate     DateTime?
+  status         String         @default("draft")
+  models         FashionModel[]
+  tests          FashionTest[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+model FashionModel {
+  id           String     @id @default(uuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  name         String
+  description  String?
+  photoUrls    String[]
+  sketchUrl    String?
+  videoUrl     String?
+  colors       String[]
+  desiredPrice Decimal?
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  questions    Question[]
+
+  @@index([collectionId])
+}
+
+model FashionTest {
+  id           String           @id @default(uuid())
+  collectionId String
+  collection   Collection       @relation(fields: [collectionId], references: [id])
+  slug         String           @unique
+  title        String
+  description  String?
+  status       String           @default("draft")
+  settings     Json
+  questions    Question[]
+  responses    PublicResponse[]
+  shares       ShareEvent[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([collectionId])
+  @@index([status])
+}
+
+model Question {
+  id        String      @id @default(uuid())
+  testId    String
+  test      FashionTest @relation(fields: [testId], references: [id])
+  text      String
+  type      String
+  required  Boolean     @default(false)
+  options   String[]
+  min       Int?
+  max       Int?
+  helpText  String?
+  modelId   String?
+  model     FashionModel? @relation(fields: [modelId], references: [id], onDelete: Restrict)
+  sortOrder Int         @default(0)
+
+  @@index([testId])
+  @@index([modelId])
+  @@index([sortOrder])
+}
+
+model PublicResponse {
+  id          String      @id @default(uuid())
+  testId      String
+  test        FashionTest @relation(fields: [testId], references: [id])
+  respondent  Json?
+  answers     Json
+  startedAt   DateTime
+  completedAt DateTime
+  idempotencyKey String?
+  createdAt   DateTime    @default(now())
+
+  @@index([testId])
+  @@index([createdAt])
+  @@unique([testId, idempotencyKey])
+}
+
+model ShareEvent {
+  id        String      @id @default(uuid())
+  testId    String
+  test      FashionTest @relation(fields: [testId], references: [id])
+  channel   String
+  createdAt DateTime    @default(now())
+
+  @@index([testId])
+  @@index([createdAt])
+}

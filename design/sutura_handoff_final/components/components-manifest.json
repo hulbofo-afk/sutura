@@ -1,0 +1,16 @@
+{
+  "brand": "Sutura",
+  "framework": "Flutter",
+  "packs": [
+    {"id":"buttons","entry":"buttons/lib/sutura_buttons.dart","status":"ready"},
+    {"id":"text-fields","entry":"text_fields/lib/sutura_text_fields.dart","status":"ready"},
+    {"id":"cards","entry":"cards/lib/sutura_cards.dart","status":"ready"},
+    {"id":"badges","entry":"badges/lib/sutura_badges.dart","status":"ready"},
+    {"id":"navigation","entry":"navigation/lib/sutura_navigation.dart","status":"ready"},
+    {"id":"overlays","entry":"overlays/lib/sutura_overlays.dart","status":"ready"},
+    {"id":"forms","entry":"forms/lib/sutura_forms.dart","status":"ready"},
+    {"id":"feedback","entry":"feedback/lib/sutura_feedback.dart","status":"ready"},
+    {"id":"layout","entry":"layout/lib/sutura_layout.dart","status":"ready"}
+  ],
+  "globalConstraints": {"minTouchTargetDp":48,"mobileWidthsDp":[360,390,430],"paletteSource":"../brand/tokens.json"}
+}

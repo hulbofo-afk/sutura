@@ -1,0 +1,21 @@
+{
+	admin localhost:2019
+}
+
+(common) {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
+	}
+}
+
+{$CADDY_PRIMARY_DOMAIN} {
+	import common
+	tls {$ACME_EMAIL}
+	reverse_proxy sutura-api:4000
+}

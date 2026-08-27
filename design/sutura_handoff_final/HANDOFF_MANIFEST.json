@@ -1,0 +1,61 @@
+{
+  "brand": "Sutura",
+  "handoff": "final",
+  "palette": {
+    "framboise": "#E90046",
+    "jaune": "#F5D500",
+    "prune": "#4A2630",
+    "rosePale": "#FCE8EB",
+    "noir": "#101418",
+    "blanc": "#FFFFFF"
+  },
+  "included": {
+    "logoFamilies": [
+      "wordmark",
+      "symbol-s",
+      "app-icon",
+      "favicon"
+    ],
+    "icons": {
+      "base": 18,
+      "colorVariants": 90
+    },
+    "flutterComponentPacks": [
+      "buttons",
+      "text-fields",
+      "cards",
+      "badges",
+      "navigation",
+      "overlays",
+      "forms",
+      "feedback",
+      "layout"
+    ],
+    "screenReferences": [
+      "onboarding",
+      "authentication",
+      "identity-board",
+      "icon-board",
+      "button-board"
+    ]
+  },
+  "sourceOfTruth": {
+    "tokens": "brand/tokens.json",
+    "logos": "brand/logos/logo-assets.json",
+    "icons": "brand/icons/icon-manifest.json",
+    "implementationOrder": "IMPLEMENTATION_ORDER.md",
+    "componentCatalog": "components/component-catalog.md"
+  },
+  "exclusions": [
+    "G-shaped logo mutation",
+    "terracotta palette as final UI palette",
+    "gradients and decorative heavy shadows"
+  ],
+  "screen_references": {
+    "path": "screens/screen_refs",
+    "count": 22,
+    "viewport": "390x844dp",
+    "documentation": "docs/SCREEN_REFERENCE_PACK.md",
+    "manifest": "screens/screen_refs/screen-reference-manifest.json"
+  }
+}

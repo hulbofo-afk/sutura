@@ -1,0 +1,18 @@
+{
+  "name": "Sutura Icon System",
+  "version": "1.1.0",
+  "format": "SVG",
+  "viewBox": "0 0 24 24",
+  "strokeWidth": 2,
+  "strokeLinecap": "round",
+  "strokeLinejoin": "round",
+  "colors": {
+    "active": "#E90046",
+    "inactive": "#4A2630",
+    "accent": "#F5D500",
+    "black": "#101418",
+    "white": "#FFFFFF"
+  },
+  "variantFolders": ["framboise", "prune", "jaune", "noir", "blanc"],
+  "icons": ["home", "collections", "create", "tests", "analytics", "notifications", "profile", "settings", "search", "filter", "back", "close", "add", "more", "check", "lock", "help", "share"]
+}

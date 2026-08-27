@@ -1,0 +1,60 @@
+{
+  "name": "sutura-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS backend for the Sutura mobile beta.",
+  "scripts": {
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "build": "nest build",
+    "test": "NODE_ENV=test vitest run",
+    "audit": "npm audit --audit-level=moderate",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "prisma db seed",
+    "db:reset": "prisma migrate reset --force && prisma db seed"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1094.0",
+    "@aws-sdk/s3-request-presigner": "^3.1094.0",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/swagger": "^11.0.3",
+    "@nestjs/throttler": "^6.5.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "7.8.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.22.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.14",
+    "@nestjs/testing": "^11.1.9",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^6.4.24",
+    "@types/pdfkit": "^0.17.4",
+    "@types/supertest": "^6.0.3",
+    "prisma": "7.8.0",
+    "supertest": "^7.1.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  },
+  "overrides": {
+    "@hono/node-server": "2.0.11",
+    "js-yaml": "5.2.2",
+    "valibot": "1.4.2"
+  }
+}

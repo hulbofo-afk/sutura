@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sutura-postgres
+    environment:
+      POSTGRES_USER: sutura
+      POSTGRES_PASSWORD: sutura
+      POSTGRES_DB: sutura
+    ports:
+      - "55432:5432"
+    volumes:
+      - sutura-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  sutura-postgres-data:

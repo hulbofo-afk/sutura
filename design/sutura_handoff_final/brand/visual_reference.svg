@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#F1E8E2"/>
+  <text x="72" y="76" font-family="Georgia,serif" font-size="38" fill="#241F1C">Sutura — mobile direction</text>
+  <text x="74" y="108" font-family="Arial,sans-serif" font-size="15" fill="#867A73">Atelier éditorial contemporain · warm, precise, tactile</text>
+  <g transform="translate(70,155)">
+    <rect width="270" height="600" rx="30" fill="#FCF9F6" stroke="#D9C8BF"/>
+    <circle cx="32" cy="34" r="14" fill="#9B482D"/><text x="26" y="40" fill="white" font-family="Georgia" font-size="18">S</text>
+    <text x="58" y="39" font-family="Arial" font-size="12" fill="#554B46">Sutura</text>
+    <text x="24" y="104" font-family="Georgia" font-size="26" fill="#241F1C">Bonjour, Aïcha.</text>
+    <text x="24" y="130" font-family="Arial" font-size="11" fill="#867A73">Voici ce qui mérite ton attention.</text>
+    <rect x="20" y="157" width="230" height="145" rx="20" fill="#9B482D"/>
+    <text x="38" y="190" font-family="Arial" font-size="10" fill="#F4DED4">PROCHAINE ÉTAPE</text>
+    <text x="38" y="222" font-family="Georgia" font-size="22" fill="white">Publier ton test</text>
+    <text x="38" y="246" font-family="Arial" font-size="11" fill="#F9E9E7">Ta collection est prête à être testée.</text>
+    <rect x="38" y="263" width="105" height="24" rx="12" fill="#C86A4A"/><text x="52" y="279" font-family="Arial" font-size="10" fill="white">Continuer →</text>
+    <text x="24" y="343" font-family="Arial" font-size="11" fill="#867A73">APERÇU</text>
+    <text x="24" y="371" font-family="Georgia" font-size="20" fill="#241F1C">Ton activité</text>
+    <rect x="24" y="390" width="67" height="70" rx="14" fill="white" stroke="#E9DED8"/><text x="36" y="418" font-family="Arial" font-size="20" fill="#9B482D">04</text><text x="36" y="442" font-family="Arial" font-size="9" fill="#867A73">collections</text>
+    <rect x="101" y="390" width="67" height="70" rx="14" fill="white" stroke="#E9DED8"/><text x="113" y="418" font-family="Arial" font-size="20" fill="#9B482D">02</text><text x="113" y="442" font-family="Arial" font-size="9" fill="#867A73">tests actifs</text>
+    <rect x="178" y="390" width="67" height="70" rx="14" fill="white" stroke="#E9DED8"/><text x="190" y="418" font-family="Arial" font-size="20" fill="#9B482D">86</text><text x="190" y="442" font-family="Arial" font-size="9" fill="#867A73">réponses</text>
+    <line x1="24" y1="513" x2="246" y2="513" stroke="#E9DED8"/><circle cx="60" cy="550" r="16" fill="#9B482D"/><circle cx="135" cy="550" r="16" fill="#E9DED8"/><circle cx="210" cy="550" r="16" fill="#E9DED8"/>
+  </g>
+  <g transform="translate(390,155)">
+    <rect width="270" height="600" rx="30" fill="#FCF9F6" stroke="#D9C8BF"/>
+    <text x="24" y="48" font-family="Georgia" font-size="27" fill="#241F1C">Collections</text><text x="24" y="72" font-family="Arial" font-size="11" fill="#867A73">Tes pièces, au même endroit.</text>
+    <rect x="20" y="102" width="230" height="178" rx="20" fill="#C86A4A"/><rect x="20" y="102" width="230" height="178" rx="20" fill="#9B482D" opacity=".18"/>
+    <text x="38" y="135" font-family="Arial" font-size="10" fill="#F9E9E7">AUTOMNE / HIVER 2026</text><text x="38" y="169" font-family="Georgia" font-size="24" fill="white">Terre rouge</text><text x="38" y="196" font-family="Arial" font-size="11" fill="#F9E9E7">8 modèles · 1 test actif</text><rect x="38" y="235" width="74" height="22" rx="11" fill="#F4DED4"/><text x="51" y="250" font-family="Arial" font-size="9" fill="#9B482D">Voir la collection</text>
+    <text x="24" y="330" font-family="Georgia" font-size="21" fill="#241F1C">Dernières pièces</text>
+    <rect x="24" y="350" width="104" height="130" rx="16" fill="#F4DED4"/><rect x="142" y="350" width="104" height="130" rx="16" fill="#F9E9E7"/><text x="34" y="505" font-family="Arial" font-size="11" fill="#554B46">Veste N°04</text><text x="152" y="505" font-family="Arial" font-size="11" fill="#554B46">Robe Sable</text>
+    <circle cx="220" cy="548" r="25" fill="#9B482D"/><text x="212" y="556" font-family="Arial" font-size="22" fill="white">+</text>
+  </g>
+  <g transform="translate(710,155)">
+    <rect width="270" height="600" rx="30" fill="#FCF9F6" stroke="#D9C8BF"/>
+    <text x="24" y="47" font-family="Georgia" font-size="25" fill="#241F1C">Un signal à suivre</text><text x="24" y="73" font-family="Arial" font-size="11" fill="#867A73">Test « Terre rouge »</text>
+    <rect x="20" y="103" width="230" height="110" rx="18" fill="#F4DED4"/><text x="38" y="135" font-family="Arial" font-size="10" fill="#9B482D">DÉSIRABILITÉ</text><text x="38" y="175" font-family="Georgia" font-size="34" fill="#241F1C">68%</text><text x="139" y="175" font-family="Arial" font-size="10" fill="#356451">+12% vs. moyenne</text>
+    <rect x="20" y="235" width="230" height="155" rx="18" fill="white" stroke="#E9DED8"/><text x="38" y="269" font-family="Georgia" font-size="19" fill="#241F1C">La coupe plaît.</text><text x="38" y="294" font-family="Arial" font-size="11" fill="#554B46">Les répondants associent</text><text x="38" y="312" font-family="Arial" font-size="11" fill="#554B46">la matière à une pièce forte.</text><rect x="38" y="345" width="164" height="26" rx="13" fill="#356451"/><text x="52" y="362" font-family="Arial" font-size="10" fill="white">Tester un prix inférieur →</text>
+    <text x="24" y="438" font-family="Arial" font-size="10" fill="#867A73">RÉPONSES PAR QUESTION</text><rect x="24" y="458" width="222" height="8" rx="4" fill="#E9DED8"/><rect x="24" y="458" width="158" height="8" rx="4" fill="#9B482D"/><rect x="24" y="488" width="222" height="8" rx="4" fill="#E9DED8"/><rect x="24" y="488" width="126" height="8" rx="4" fill="#C86A4A"/>
+  </g>
+  <g transform="translate(1030,155)">
+    <rect width="270" height="600" rx="30" fill="#FCF9F6" stroke="#D9C8BF"/>
+    <text x="24" y="48" font-family="Georgia" font-size="24" fill="#241F1C">Ton avis compte.</text><text x="24" y="73" font-family="Arial" font-size="11" fill="#867A73">Terre rouge · 3 questions</text><rect x="24" y="101" width="222" height="5" rx="2.5" fill="#E9DED8"/><rect x="24" y="101" width="74" height="5" rx="2.5" fill="#9B482D"/>
+    <text x="24" y="168" font-family="Arial" font-size="10" fill="#9B482D">QUESTION 1 SUR 3</text><text x="24" y="209" font-family="Georgia" font-size="25" fill="#241F1C">Que penses-tu de</text><text x="24" y="239" font-family="Georgia" font-size="25" fill="#241F1C">cette silhouette ?</text>
+    <rect x="24" y="280" width="222" height="49" rx="14" fill="white" stroke="#E9DED8"/><circle cx="48" cy="304" r="9" fill="#F4DED4"/><text x="70" y="310" font-family="Arial" font-size="12" fill="#554B46">Je l’adore</text><rect x="24" y="341" width="222" height="49" rx="14" fill="#F4DED4" stroke="#9B482D"/><circle cx="48" cy="365" r="9" fill="#9B482D"/><text x="70" y="371" font-family="Arial" font-size="12" fill="#241F1C">Elle me plaît</text><rect x="24" y="530" width="222" height="48" rx="14" fill="#9B482D"/><text x="111" y="559" font-family="Arial" font-size="13" fill="white">Suivant</text>
+  </g>
+  <text x="72" y="825" font-family="Arial" font-size="13" fill="#554B46">Signature : terre cuite · blush · encre chaude · matière · hiérarchie éditoriale</text>
+</svg>

@@ -1,0 +1,82 @@
+name: sutura-local
+
+services:
+  postgres:
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    container_name: sutura-postgres-local
+    environment:
+      POSTGRES_USER: sutura
+      POSTGRES_PASSWORD: sutura
+      POSTGRES_DB: sutura
+    ports:
+      - "55432:5432"
+    volumes:
+      - postgres-data-local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sutura -d sutura"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - sutura-local-net
+
+  init:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: sutura-init-local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://sutura:sutura@postgres:5432/sutura
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[init] applying schema..."
+        npx prisma migrate deploy
+        if [ "$$SEED" = "1" ]; then
+          echo "[init] seeding..."
+          node dist/seed.js
+        else
+          echo "[init] skipping seed (set SEED=1 to enable)"
+        fi
+        echo "[init] done"
+    networks:
+      - sutura-local-net
+
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: sutura-api-local
+    stop_grace_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgresql://sutura:sutura@postgres:5432/sutura
+      JWT_SECRET: local-dev-jwt-secret-not-for-production
+      PUBLIC_APP_URL: http://localhost:4000
+      API_PUBLIC_URL: http://localhost:4000
+      R2_ACCOUNT_ID: local-placeholder
+      R2_ACCESS_KEY_ID: local-placeholder
+      R2_SECRET_ACCESS_KEY: local-placeholder
+      R2_BUCKET: suturamode-media
+      R2_PUBLIC_BASE_URL: http://localhost:4000/uploads
+    ports:
+      - "4000:4000"
+    networks:
+      - sutura-local-net
+
+volumes:
+  postgres-data-local:
+
+networks:
+  sutura-local-net:
+    driver: bridge

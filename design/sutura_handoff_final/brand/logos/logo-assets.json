@@ -1,0 +1,27 @@
+{
+  "brand": "Sutura",
+  "palette": {
+    "framboise": "#E90046",
+    "jaune": "#F5D500",
+    "prune": "#4A2630",
+    "rosePale": "#FCE8EB",
+    "noir": "#101418",
+    "blanc": "#FFFFFF"
+  },
+  "primary": {
+    "wordmark": "wordmark-framboise-transparent.png",
+    "symbol": "symbol-s-framboise-transparent.png",
+    "appIcon": "app-icon-framboise-1024.png"
+  },
+  "families": {
+    "wordmark": "wordmark-*.png",
+    "symbol": "symbol-s-*.png",
+    "appIcon": "app-icon-*.png",
+    "favicon": "favicon-*.png"
+  },
+  "flutter": {
+    "recommendedAssetScale": "1024px source; let Flutter scale down",
+    "fit": "contain",
+    "preserveAspectRatio": true
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "name": "Sutura Screen Reference Pack",
+  "version": "2.0.0",
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "unit": "dp"
+  },
+  "palette": {
+    "raspberry": "#E90046",
+    "yellow": "#F5D500",
+    "plum": "#4A2630",
+    "pale": "#FCE8EB",
+    "ink": "#101418",
+    "white": "#FFFFFF",
+    "muted": "#75666A",
+    "line": "#E9DDE0",
+    "canvas": "#FFFDFC",
+    "green": "#2F8067"
+  },
+  "screenCount": 22,
+  "screens": [
+    {
+      "file": "01-onboarding-welcome.svg",
+      "id": "01-onboarding-welcome",
+      "path": "screens/screen_refs/01-onboarding-welcome.svg"
+    },
+    {
+      "file": "02-onboarding-value.svg",
+      "id": "02-onboarding-value",
+      "path": "screens/screen_refs/02-onboarding-value.svg"
+    },
+    {
+      "file": "03-onboarding-brand.svg",
+      "id": "03-onboarding-brand",
+      "path": "screens/screen_refs/03-onboarding-brand.svg"
+    },
+    {
+      "file": "04-onboarding-first-collection.svg",
+      "id": "04-onboarding-first-collection",
+      "path": "screens/screen_refs/04-onboarding-first-collection.svg"
+    },
+    {
+      "file": "05-onboarding-first-test.svg",
+      "id": "05-onboarding-first-test",
+      "path": "screens/screen_refs/05-onboarding-first-test.svg"
+    },
+    {
+      "file": "06-auth-login.svg",
+      "id": "06-auth-login",
+      "path": "screens/screen_refs/06-auth-login.svg"
+    },
+    {
+      "file": "07-create-account.svg",
+      "id": "07-create-account",
+      "path": "screens/screen_refs/07-create-account.svg"
+    },
+    {
+      "file": "08-creator-home.svg",
+      "id": "08-creator-home",
+      "path": "screens/screen_refs/08-creator-home.svg"
+    },
+    {
+      "file": "09-create-collection.svg",
+      "id": "09-create-collection",
+      "path": "screens/screen_refs/09-create-collection.svg"
+    },
+    {
+      "file": "10-add-model.svg",
+      "id": "10-add-model",
+      "path": "screens/screen_refs/10-add-model.svg"
+    },
+    {
+      "file": "11-test-list.svg",
+      "id": "11-test-list",
+      "path": "screens/screen_refs/11-test-list.svg"
+    },
+    {
+      "file": "12-test-editor.svg",
+      "id": "12-test-editor",
+      "path": "screens/screen_refs/12-test-editor.svg"
+    },
+    {
+      "file": "13-question-editor.svg",
+      "id": "13-question-editor",
+      "path": "screens/screen_refs/13-question-editor.svg"
+    },
+    {
+      "file": "14-test-preview.svg",
+      "id": "14-test-preview",
+      "path": "screens/screen_refs/14-test-preview.svg"
+    },
+    {
+      "file": "15-publish-success.svg",
+      "id": "15-publish-success",
+      "path": "screens/screen_refs/15-publish-success.svg"
+    },
+    {
+      "file": "16-collection-detail.svg",
+      "id": "16-collection-detail",
+      "path": "screens/screen_refs/16-collection-detail.svg"
+    },
+    {
+      "file": "17-analytics.svg",
+      "id": "17-analytics",
+      "path": "screens/screen_refs/17-analytics.svg"
+    },
+    {
+      "file": "18-recommendations.svg",
+      "id": "18-recommendations",
+      "path": "screens/screen_refs/18-recommendations.svg"
+    },
+    {
+      "file": "19-profile.svg",
+      "id": "19-profile",
+      "path": "screens/screen_refs/19-profile.svg"
+    },
+    {
+      "file": "20-public-intro.svg",
+      "id": "20-public-intro",
+      "path": "screens/screen_refs/20-public-intro.svg"
+    },
+    {
+      "file": "21-public-question.svg",
+      "id": "21-public-question",
+      "path": "screens/screen_refs/21-public-question.svg"
+    },
+    {
+      "file": "22-public-confirmation.svg",
+      "id": "22-public-confirmation",
+      "path": "screens/screen_refs/22-public-confirmation.svg"
+    }
+  ],
+  "notes": "Use the canonical visual board for composition, density, typography and hierarchy. SVGs remain deterministic implementation references.",
+  "visualDirection": "screens/screen-reference-pack-preview.png"
+}
