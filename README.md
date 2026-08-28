@@ -1,94 +1,99 @@
-# Sutura — Backend + Design Handoff
+# Sutura
 
-Backend NestJS/PostgreSQL (MVP) + specs frontend + design system pour Sutura — produit mobile-first (app créateur Flutter).
+Sutura est un atelier de décision pour créateurs de mode : création de collections, tests publics par lien, collecte de réponses, analytics et recommandations IA.
 
-Ce repo public expose **uniquement** :
-- **Backend** `apps/api` (NestJS 11 + Prisma 7 + PostgreSQL)
-- **Specs frontend** `docs/web-frontend-plan.md` + `apps/api/API_CONTRACT.md`
-- **Design handoff** `design/sutura_handoff_final` (tokens, logos, screens, composants)
-- **Infra** `infra/` (Docker + Caddy + backup, sans secrets)
+## Architecture actuelle
 
-Le code du frontend actuel (`apps/web`) n'est **pas** publié ici (volontaire).
+La trajectoire active est **Next.js + Convex** :
 
-## Démarrage backend
+- `apps/web/` — application web Next.js App Router ;
+- `apps/web/convex/` — schéma, queries, mutations et actions Convex ;
+- `apps/web/convex/auth.ts` — authentification Convex Auth ;
+- Imole — provider IA optionnel appelé depuis une action Convex ;
+- stockage Convex — médias des modèles et URLs signées.
+
+Le questionnaire public reste accessible sans compte. Les opérations créateur, analytics et recommandations sont protégées par authentification et ownership Convex.
+
+`apps/api/` (NestJS/PostgreSQL) est conservé temporairement comme **backend historique de référence**. Il ne constitue plus le chemin d’exécution du frontend actif et ne doit pas recevoir de nouvelles fonctionnalités sans décision d’architecture explicite.
+
+## Démarrer le frontend Convex
+
+Pré-requis : Node.js 22+ et un déploiement Convex de développement.
 
 ```bash
-cd apps/api
+cd apps/web
 npm install
-cp .env.example .env
-docker compose up -d postgres
-npm run db:reset
-npm run start:dev
+cp .env.example .env.local
+npm run dev
 ```
 
-API : `http://localhost:4000/api`
+`npx convex dev` renseigne automatiquement les variables de déploiement nécessaires dans `.env.local`. Ne jamais committer de clé Convex, de token Imole ou de fichier `.env.local`.
 
-Compte seed :
+Commandes utiles :
+
+```bash
+cd apps/web
+npm run dev:web          # Next.js seul, si Convex est déjà lancé
+npm run typecheck
+npm run lint
+npm run test:validation
+npm run build
+npm run convex:codegen
+npm run convex:deploy
+```
+
+## Flux produit
+
+1. Le créateur s’inscrit et complète son profil.
+2. Il crée une collection et ses modèles.
+3. Il compose un fashion test et ses questions.
+4. Il publie un lien `/s/:slug`.
+5. Les répondants répondent sans compte.
+6. Le créateur consulte les analytics et peut générer des recommandations IA.
+
+Les soumissions publiques sont validées côté Convex : idempotence, questions connues, types de réponses, options, classements, bornes numériques et profil répondant.
+
+## Structure principale
 
 ```text
-email: creator@sutura.app
-password: password123
+apps/web/
+├── app/                 # routes et écrans Next.js
+├── components/          # composants d’interface
+├── convex/
+│   ├── schema.ts        # modèle de données Convex
+│   ├── auth.ts          # Convex Auth
+│   ├── validation.ts    # validations métier partagées
+│   └── _generated/      # bindings générés et versionnés
+└── tests/               # tests ciblés
 ```
 
-Obtenir un token :
+## Configuration
 
-```bash
-curl -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"creator@sutura.app","password":"password123"}'
-```
+Variables principales :
 
-## Routes MVP
+- `NEXT_PUBLIC_CONVEX_URL` — URL Convex utilisée par le navigateur ;
+- `CONVEX_DEPLOYMENT` — déploiement local/dev, renseigné par la CLI ;
+- `CONVEX_SITE_URL` — URL du site utilisée par Convex Auth ;
+- `IMOLE_BASE_URL`, `IMOLE_API_KEY`, `IMOLE_MODEL` — configuration IA côté déploiement Convex uniquement.
 
-Auth : `POST /auth/register`, `POST /auth/login`, `GET /auth/me`
+Les secrets de déploiement doivent être configurés dans l’environnement Convex ou dans le gestionnaire de secrets du déploiement, jamais dans GitHub.
 
-Collections : `GET/POST /collections`, `GET/PATCH /collections/:id`, `POST /collections/:id/archive`
+## État du produit
 
-Models : `POST/PATCH/DELETE /collections/:collectionId/models`, `POST /collections/:collectionId/models/reorder`
+Le socle Convex est déployé et couvre les flux de base. Les prochains lots portent sur l’édition et le réordonnancement, les réglages avancés des tests, la protection anti-abus publique, les uploads et le durcissement de l’intégration IA.
 
-Fashion Tests : `GET /fashion-tests`, `POST /collections/:collectionId/fashion-tests`, `GET/PATCH /fashion-tests/:testId`, `POST /fashion-tests/:testId/publish|close`
+## Documentation
 
-Questions : `POST/PATCH/DELETE /fashion-tests/:testId/questions`, `POST /fashion-tests/:testId/questions/reorder`
+- `AGENTS.md` — règles de contribution actuelles ;
+- `HANDOFF.md` — état architectural et passation ;
+- `BACKLOG.md` — backlog de transition et éléments historiques ;
+- `docs/` — audits et plans historiques, conservés comme contexte ;
+- `design/` — direction visuelle et assets.
 
-Public (sans auth) : `GET /public-tests/:slug`, `POST /public-tests/:slug/responses`
+## Règles GitHub
 
-Analytics / Reco / Reports (JWT) : `GET /analytics/:testId`, `GET /ai-recommendations/:testId`, `GET /reports/fashion-tests/:testId.pdf`
-
-Uploads : `POST /uploads/sign`, `POST /uploads/confirm`, `DELETE /uploads`
-
-Health : `GET /health`, `GET /health/ready`, `GET /health/extended` (JWT)
-
-## Contrat API
-
-Voir `apps/api/API_CONTRACT.md` et `docs/web-frontend-plan.md` pour le contrat stable frontend/backend.
-
-## Design
-
-- `design/sutura_handoff_final/brand/` — tokens, logos, UI system
-- `design/sutura_handoff_final/screens/screen_refs/` — 22 écrans ref (SVG/PNG)
-- `design/sutura_handoff_final/docs/` — direction visuelle, flows, specs
-- `design/sutura_handoff_final/components/` — Flutter component packs
-
-Palette : rose/magenta premium minimaliste — voir `design/sutura_handoff_final/brand/tokens.json`
-
-## Validation
-
-```bash
-npm run typecheck
-npm run build
-npm run test
-npm audit --audit-level=moderate
-npx prisma validate
-```
-
-## Infra
-
-Voir `infra/README.md` + `infra/.env.production.example` pour le deploy VPS/R2.
-
-Ne jamais committer `.env`.
-
-## Documentation complète
-
-- `HANDOFF.md` — dossier de passation
-- `BACKLOG.md` — backlog backend
-- `AGENTS.md` — règles de travail
+- Ne jamais committer de secrets ou de données de production ;
+- garder le frontend et les fonctions Convex cohérents dans une même PR ;
+- valider typecheck, lint, tests ciblés et build avant fusion ;
+- vérifier l’ownership de chaque query/mutation privée ;
+- conserver les routes publiques du questionnaire sans authentification.

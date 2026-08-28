@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { AppProviders } from "./providers";
 import "./globals.css";
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   description: "Teste tes collections avant de produire.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="fr"

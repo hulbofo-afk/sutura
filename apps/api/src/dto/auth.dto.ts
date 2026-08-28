@@ -37,6 +37,30 @@ export class RegisterDto {
   country?: string;
 }
 
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  brandName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  country?: string;
+}
+
 export class LoginDto {
   @ApiProperty({ example: "creator@sutura.app" })
   @IsEmail()

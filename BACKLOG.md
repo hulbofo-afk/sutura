@@ -1,6 +1,20 @@
-# Backend backlog — Sutura API
+# Sutura — backlog de transition
 
-Priorité actuelle : terminer un backend MVP complet et robuste avant le branchement Flutter.
+> **Architecture active (28 août 2026) : Next.js + Convex dans `apps/web`.**
+> Ce fichier conserve le backlog et les décisions du backend NestJS historique (`apps/api`) pour traçabilité. Les nouvelles tâches doivent être ajoutées dans la roadmap Convex ci-dessous, sauf décision d’architecture explicite.
+
+## Roadmap active — Convex
+
+1. Réglages éditables des tests, édition et réordonnancement des questions/modèles.
+2. Questionnaire public complet : randomisation effective, classement visuel et présentation des modèles.
+3. Validation des uploads, nettoyage des médias orphelins et protection anti-abus.
+4. Agrégation/anonymisation du payload IA, timeout/retry et validation de sortie Imole.
+5. Analytics avancées, rapport frontend et tests Playwright mobile/desktop.
+6. Préparation production puis décision sur le retrait du backend NestJS historique.
+
+## Backlog historique — NestJS/PostgreSQL
+
+Priorité historique : terminer un backend MVP complet et robuste avant le branchement Flutter.
 
 ## P0 — À faire avant connexion mobile
 

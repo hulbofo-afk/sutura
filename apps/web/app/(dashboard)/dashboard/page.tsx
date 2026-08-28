@@ -1,23 +1,9 @@
-import Image from "next/image";
-import { ArrowUpRight, Clock3, FolderOpen, Sparkles, Users } from "lucide-react";
-import { NewCollectionButton } from "@/components/dashboard-shell";
-
-const metrics = [
-  { label: "Collections", value: "03", icon: FolderOpen },
-  { label: "Réponses reçues", value: "128", icon: Users },
-  { label: "Tests actifs", value: "02", icon: Clock3 },
-];
-
-export default function DashboardPage() {
-  return <div className="space-y-10">
-    <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-      <div><p className="text-xs font-bold uppercase tracking-[0.2em] text-framboise">Mardi 27 août 2026</p><h1 className="display-font mt-2 text-5xl font-semibold leading-none text-prune sm:text-6xl">Bonjour, Samsiath.</h1><p className="mt-3 text-sm text-prune/60">Ton atelier avance bien. Voici où tu en es.</p></div>
-      <NewCollectionButton />
-    </header>
-    <section className="grid gap-4 sm:grid-cols-3">{metrics.map(({ label, value, icon: Icon }) => <div key={label} className="rounded-[20px] border border-line bg-white p-5"><Icon className="h-5 w-5 text-framboise" /><p className="mt-7 text-xs font-semibold text-prune/55">{label}</p><p className="mt-1 text-3xl font-bold text-prune">{value}</p></div>)}</section>
-    <section className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
-      <div className="overflow-hidden rounded-[20px] bg-prune p-7 text-white sm:p-9"><div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-jaune">Prochaine étape</p><h2 className="display-font mt-4 max-w-md text-4xl font-semibold leading-none">Fais parler ta collection.</h2><p className="mt-4 max-w-sm text-sm leading-6 text-white/65">Crée un test rapide et découvre les modèles qui donnent envie.</p></div><Sparkles className="h-6 w-6 text-jaune" /></div><a href="/collections/new" className="mt-8 inline-flex items-center rounded-[14px] bg-jaune px-5 py-3 text-sm font-bold text-prune">Créer un test <ArrowUpRight className="ml-2 h-4 w-4" /></a></div>
-      <div className="relative min-h-[260px] overflow-hidden rounded-[20px] bg-rose-pale"><Image src="/brand/tissu.jpg" alt="Texture textile" fill className="object-cover opacity-65 mix-blend-multiply" /><div className="absolute inset-0 bg-gradient-to-t from-prune/80 to-transparent" /><div className="absolute bottom-6 left-6 text-white"><p className="text-xs font-bold uppercase tracking-[0.2em] text-jaune">Inspiration</p><p className="display-font mt-2 text-3xl font-semibold">Chaque détail compte.</p></div></div>
-    </section>
-  </div>;
-}
+"use client";
+import Link from "next/link";
+import { useQuery } from "convex/react";
+import { ArrowRight, FolderOpen, Plus, Sparkles, TestTube2, Users } from "lucide-react";
+import { api } from "@/convex/_generated/api";
+import { StatusBadge, collectionStatusMeta } from "@/components/ui/badge";
+import { MetricSkeleton, Skeleton } from "@/components/ui/skeleton";
+import { relativeDate } from "@/lib/date";
+export default function DashboardPage(){const profile=useQuery(api.profiles.get);const collections=useQuery(api.collections.list,{});const tests=useQuery(api.fashionTests.list,{});const loading=!collections||!tests;const items=collections??[];const testItems=tests??[];const active=testItems.filter(t=>t.status==="published").length;const responses=testItems.reduce((s,t)=>s+t.responsesCount,0);const featured=items.find(x=>x.status==="published")??items[0];const today=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date());return <div className="space-y-10"><header><p className="t-eyebrow capitalize text-framboise">{today}</p><h1 className="t-display-lg mt-3 text-prune">Bonjour {profile?.name.split(" ")[0]??"Créateur"}.</h1></header><section>{loading?<Skeleton className="h-64 w-full"/>:featured?<Link href={`/collections/${featured.id}`} className="block rounded-[24px] bg-prune p-8 text-white"><p className="t-eyebrow text-jaune">Collection à poursuivre</p><div className="mt-4 flex items-end justify-between"><div><h2 className="display-font text-5xl font-semibold">{featured.title}</h2><p className="mt-3 text-sm text-white/65">{featured.description||"Ajoute tes modèles et prépare un test."}</p></div><span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-prune"><ArrowRight/></span></div></Link>:<div className="rounded-[24px] bg-prune p-8 text-white"><h2 className="display-font text-4xl font-semibold">Crée ta première collection.</h2><Link href="/collections/new" className="mt-6 inline-flex h-12 items-center gap-2 rounded-[14px] bg-jaune px-5 font-bold text-prune"><Plus className="h-4 w-4"/>Commencer</Link></div>}</section><section><h2 className="mb-4 font-bold text-prune">Ton activité</h2><div className="grid grid-cols-3 gap-3">{loading?[1,2,3].map(i=><MetricSkeleton key={i}/>):[{label:"Collections",value:items.length,icon:FolderOpen},{label:"Tests actifs",value:active,icon:TestTube2},{label:"Réponses",value:responses,icon:Users}].map(({label,value,icon:Icon})=><div key={label} className="rounded-[18px] border border-line bg-white p-4"><Icon className="h-5 w-5 text-framboise"/><p className="display-font mt-4 text-4xl text-prune">{value}</p><p className="text-xs text-prune/55">{label}</p></div>)}</div></section><section><h2 className="mb-4 font-bold text-prune">Collections récentes</h2><div className="space-y-3">{items.slice(0,4).map(c=>{const meta=collectionStatusMeta[c.status]??collectionStatusMeta.draft;return <Link key={c.id} href={`/collections/${c.id}`} className="flex items-center gap-4 rounded-[18px] border border-line bg-white p-4"><span className="min-w-0 flex-1"><strong className="block truncate text-prune">{c.title}</strong><small className="text-prune/50">{c.modelsCount} modèles · {relativeDate(c.updatedAt)}</small></span><StatusBadge tone={meta.tone}>{meta.label}</StatusBadge></Link>})}</div></section><section className="rounded-[20px] bg-rose-clair p-6"><p className="flex items-center gap-2 text-xs font-bold text-prune"><Sparkles className="h-4 w-4 text-framboise"/>Le fil conducteur</p><p className="mt-2 text-sm text-prune/70">Vise au moins 30 réponses par test.</p></section></div>}

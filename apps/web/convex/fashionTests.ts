@@ -1,43 +1,164 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
 import { v } from "convex/values";
+import { assertOwnedCollection, assertOwnedTest, publicQuestion, publicSettings, requireUserId } from "./lib";
+import { validateQuestionDefinition } from "./validation";
 
-async function currentUserId(ctx: { auth: { getUserIdentity: () => Promise<{ subject: string } | null> } }) {
-  return (await ctx.auth.getUserIdentity())?.subject ?? null;
+async function dto(ctx: QueryCtx, test: Doc<"fashionTests">) {
+  const questions = await ctx.db.query("questions").withIndex("by_test", q => q.eq("testId", test._id)).collect();
+  const responses = await ctx.db.query("publicResponses").withIndex("by_test", q => q.eq("testId", test._id)).collect();
+  const models = await ctx.db.query("models").withIndex("by_collection", q => q.eq("collectionId", test.collectionId)).collect();
+  return { ...test, id: test._id, settings: publicSettings(test.settings), questions: questions.sort((a, b) => a.sortOrder - b.sortOrder).map(publicQuestion), responsesCount: responses.length, modelsCount: models.length, createdAt: new Date(test.createdAt).toISOString(), updatedAt: new Date(test.updatedAt).toISOString(), publicUrl: null };
 }
 
-const status = v.union(v.literal("draft"), v.literal("published"), v.literal("closed"));
+export const list = query({ args: {}, handler: async ctx => {
+  const user = await requireUserId(ctx);
+  const rows = await ctx.db.query("fashionTests").withIndex("by_creator", q => q.eq("creatorId", user)).order("desc").collect();
+  return Promise.all(rows.map(row => dto(ctx, row)));
+} });
 
-export const list = query({
-  args: { status: v.optional(status) },
-  handler: async (ctx, args) => {
-    const userId = await currentUserId(ctx);
-    if (!userId) return [];
-    const tests = await ctx.db.query("fashionTests").withIndex("by_creator", (q) => q.eq("creatorId", userId)).collect();
-    return args.status ? tests.filter((test) => test.status === args.status) : tests;
-  },
-});
+export const get = query({ args: { id: v.id("fashionTests") }, handler: async (ctx, { id }) => {
+  const user = await requireUserId(ctx);
+  return dto(ctx, await assertOwnedTest(ctx, id, user));
+} });
 
-export const create = mutation({
-  args: { collectionId: v.id("collections"), title: v.string(), description: v.optional(v.string()) },
-  handler: async (ctx, args) => {
-    const creatorId = await currentUserId(ctx);
-    const collection = await ctx.db.get(args.collectionId);
-    if (!creatorId || !collection || collection.creatorId !== creatorId) throw new Error("Collection introuvable");
-    const title = args.title.trim();
-    if (!title) throw new Error("Le titre du test est requis");
-    const slug = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${Date.now().toString(36)}`;
-    const now = Date.now();
-    return ctx.db.insert("fashionTests", { ...args, title, creatorId, slug, status: "draft", settings: { anonymousResponses: true, collectRespondentProfile: false }, createdAt: now, updatedAt: now });
-  },
-});
+export const create = mutation({ args: { collectionId: v.id("collections"), title: v.string(), description: v.optional(v.string()) }, handler: async (ctx, args) => {
+  const creatorId = await requireUserId(ctx);
+  await assertOwnedCollection(ctx, args.collectionId, creatorId);
+  const title = args.title.trim();
+  if (!title) throw new Error("Le titre du test est requis.");
+  const base = title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "test";
+  const now = Date.now();
+  return ctx.db.insert("fashionTests", { ...args, title, creatorId, slug: `${base}-${now.toString(36)}`, status: "draft", settings: { anonymousResponses: true, collectRespondentProfile: [], randomizeQuestions: false, requireAllQuestions: false, completionMessage: "Merci, ta réponse a bien été enregistrée." }, createdAt: now, updatedAt: now });
+} });
 
-export const addQuestion = mutation({
-  args: { testId: v.id("fashionTests"), text: v.string(), type: v.string(), required: v.boolean(), options: v.array(v.string()), modelId: v.optional(v.id("models")) },
-  handler: async (ctx, args) => {
-    const creatorId = await currentUserId(ctx);
-    const test = await ctx.db.get(args.testId);
-    if (!creatorId || !test || test.creatorId !== creatorId || test.status !== "draft") throw new Error("Test non modifiable");
-    const questions = await ctx.db.query("questions").withIndex("by_test", (q) => q.eq("testId", args.testId)).collect();
-    return ctx.db.insert("questions", { ...args, sortOrder: questions.length });
-  },
-});
+export const updateSettings = mutation({ args: {
+  id: v.id("fashionTests"),
+  maxResponses: v.optional(v.union(v.number(), v.null())),
+  closesAt: v.optional(v.union(v.number(), v.null())),
+  anonymousResponses: v.optional(v.boolean()),
+  collectRespondentProfile: v.optional(v.union(v.boolean(), v.array(v.string()))),
+  randomizeQuestions: v.optional(v.boolean()),
+  requireAllQuestions: v.optional(v.boolean()),
+  completionMessage: v.optional(v.string()),
+}, handler: async (ctx, { id, ...patch }) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, id, user);
+  if (test.status !== "draft") throw new Error("Les réglages d'un test publié ne sont plus modifiables.");
+  if (patch.maxResponses !== undefined && patch.maxResponses !== null && (!Number.isInteger(patch.maxResponses) || patch.maxResponses < 1)) throw new Error("La limite de réponses est invalide.");
+  if (patch.closesAt !== undefined && patch.closesAt !== null && patch.closesAt <= Date.now()) throw new Error("La date de fermeture doit être dans le futur.");
+  if (patch.completionMessage !== undefined && patch.completionMessage.trim().length > 240) throw new Error("Le message de fin est trop long.");
+  const settings = { ...test.settings };
+  if (patch.maxResponses !== undefined) {
+    if (patch.maxResponses === null) delete settings.maxResponses;
+    else settings.maxResponses = patch.maxResponses;
+  }
+  if (patch.closesAt !== undefined) {
+    if (patch.closesAt === null) delete settings.closesAt;
+    else settings.closesAt = patch.closesAt;
+  }
+  if (patch.anonymousResponses !== undefined) settings.anonymousResponses = patch.anonymousResponses;
+  if (patch.collectRespondentProfile !== undefined) settings.collectRespondentProfile = patch.collectRespondentProfile;
+  if (patch.randomizeQuestions !== undefined) settings.randomizeQuestions = patch.randomizeQuestions;
+  if (patch.requireAllQuestions !== undefined) settings.requireAllQuestions = patch.requireAllQuestions;
+  if (patch.completionMessage !== undefined) settings.completionMessage = patch.completionMessage.trim() || undefined;
+  await ctx.db.patch(id, { settings, updatedAt: Date.now() });
+  return id;
+} });
+
+const questionArgs = {
+  text: v.string(),
+  type: v.string(),
+  required: v.boolean(),
+  options: v.array(v.string()),
+  modelId: v.optional(v.id("models")),
+  min: v.optional(v.number()),
+  max: v.optional(v.number()),
+  helpText: v.optional(v.string()),
+};
+
+async function assertQuestionModel(ctx: QueryCtx, test: Doc<"fashionTests">, modelId: Id<"models"> | undefined, user: string) {
+  if (!modelId) return;
+  const model = await ctx.db.get(modelId);
+  if (!model || model.creatorId !== user || model.collectionId !== test.collectionId) throw new Error("Le modèle sélectionné est invalide.");
+}
+
+export const addQuestion = mutation({ args: { testId: v.id("fashionTests"), ...questionArgs }, handler: async (ctx, args) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, args.testId, user);
+  if (test.status !== "draft") throw new Error("Un test publié ne peut plus être modifié.");
+  const question = validateQuestionDefinition(args);
+  await assertQuestionModel(ctx, test, args.modelId, user);
+  const rows = await ctx.db.query("questions").withIndex("by_test", q => q.eq("testId", args.testId)).collect();
+  return ctx.db.insert("questions", { ...args, ...question, sortOrder: rows.length });
+} });
+
+export const updateQuestion = mutation({ args: { testId: v.id("fashionTests"), questionId: v.id("questions"), ...questionArgs }, handler: async (ctx, args) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, args.testId, user);
+  const questionRow = await ctx.db.get(args.questionId);
+  if (test.status !== "draft" || !questionRow || questionRow.testId !== args.testId) throw new Error("Question non modifiable.");
+  const question = validateQuestionDefinition(args);
+  await assertQuestionModel(ctx, test, args.modelId, user);
+  await ctx.db.patch(args.questionId, {
+    text: question.text,
+    type: args.type,
+    required: args.required,
+    options: question.options,
+    modelId: args.modelId,
+    min: question.min,
+    max: question.max,
+    helpText: args.helpText?.trim() || undefined,
+  });
+  return args.questionId;
+} });
+
+export const reorderQuestions = mutation({ args: { testId: v.id("fashionTests"), questionIds: v.array(v.id("questions")) }, handler: async (ctx, args) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, args.testId, user);
+  if (test.status !== "draft") throw new Error("Un test publié ne peut plus être modifié.");
+  const rows = await ctx.db.query("questions").withIndex("by_test", q => q.eq("testId", args.testId)).collect();
+  if (args.questionIds.length !== rows.length || new Set(args.questionIds).size !== rows.length || rows.some(row => !args.questionIds.includes(row._id))) throw new Error("L'ordre des questions est invalide.");
+  await Promise.all(args.questionIds.map((questionId, index) => ctx.db.patch(questionId, { sortOrder: index })));
+  return args.questionIds;
+} });
+
+export const removeQuestion = mutation({ args: { testId: v.id("fashionTests"), questionId: v.id("questions") }, handler: async (ctx, args) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, args.testId, user);
+  const question = await ctx.db.get(args.questionId);
+  if (test.status !== "draft" || !question || question.testId !== args.testId) throw new Error("Question non modifiable.");
+  await ctx.db.delete(args.questionId);
+} });
+
+export const publish = mutation({ args: { id: v.id("fashionTests") }, handler: async (ctx, { id }) => {
+  const user = await requireUserId(ctx);
+  const test = await assertOwnedTest(ctx, id, user);
+  if (test.status !== "draft") throw new Error("Ce test n'est plus publiable.");
+  const questions = await ctx.db.query("questions").withIndex("by_test", q => q.eq("testId", id)).collect();
+  const models = await ctx.db.query("models").withIndex("by_collection", q => q.eq("collectionId", test.collectionId)).collect();
+  if (!questions.length || !models.length) throw new Error("Ajoutez au moins un modèle et une question.");
+  for (const question of questions) {
+    validateQuestionDefinition(question);
+    if (question.modelId && !models.some(model => model._id === question.modelId)) throw new Error("Une question référence un modèle invalide.");
+  }
+  if (test.settings.closesAt !== undefined && test.settings.closesAt <= Date.now()) throw new Error("La date de fermeture doit être dans le futur.");
+  if (test.settings.maxResponses !== undefined && (!Number.isInteger(test.settings.maxResponses) || test.settings.maxResponses < 1)) throw new Error("La limite de réponses est invalide.");
+  await ctx.db.patch(id, { status: "published", updatedAt: Date.now() });
+  return id;
+} });
+
+export const close = mutation({ args: { id: v.id("fashionTests") }, handler: async (ctx, { id }) => {
+  const user = await requireUserId(ctx);
+  await assertOwnedTest(ctx, id, user);
+  await ctx.db.patch(id, { status: "closed", updatedAt: Date.now() });
+  return id;
+} });
+
+export const recordShare = mutation({ args: { id: v.id("fashionTests"), channel: v.string() }, handler: async (ctx, args) => {
+  const user = await requireUserId(ctx);
+  await assertOwnedTest(ctx, args.id, user);
+  const channel = args.channel.trim().toLowerCase();
+  if (!channel || channel.length > 40) throw new Error("Canal de partage invalide.");
+  return ctx.db.insert("shareEvents", { testId: args.id, channel, createdAt: Date.now() });
+} });

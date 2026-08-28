@@ -1,11 +1,11 @@
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { SkipThrottle, Throttle } from "@nestjs/throttler";
 import type { Request } from "express";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import type { AuthUser } from "../auth/jwt-auth.guard";
-import { ChangePasswordDto, ConfirmEmailChangeDto, RefreshDto, RequestEmailChangeDto } from "../dto/auth.dto";
+import { ChangePasswordDto, ConfirmEmailChangeDto, RefreshDto, RequestEmailChangeDto, UpdateProfileDto } from "../dto/auth.dto";
 import { LoginDto, RegisterDto } from "../dto/auth.dto";
 import { AuthService } from "../services/auth.service";
 
@@ -65,6 +65,15 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "User profile" })
   me(@CurrentUser() user: AuthUser) {
     return this.auth.me(user.id);
+  }
+
+  @Patch("me")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update current creator profile" })
+  @ApiResponse({ status: 200, description: "Profile updated" })
+  updateMe(@CurrentUser() user: AuthUser, @Body() input: UpdateProfileDto) {
+    return this.auth.updateProfile(user.id, input);
   }
 
   @Throttle({ medium: { limit: 5, ttl: 60_000 } })

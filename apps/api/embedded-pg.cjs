@@ -1,7 +1,8 @@
 const EmbeddedPostgres = require("embedded-postgres").default;
+const path = require("node:path");
 
 const pg = new EmbeddedPostgres({
-  databaseDir: "/home/hopeman/labs/sutura/apps/api/.pgdata",
+  databaseDir: path.join(__dirname, ".pgdata"),
   user: "sutura",
   password: "sutura",
   port: 55432,

@@ -120,7 +120,7 @@ export class ReportsService {
       ["Collection", input.collection.title + (input.collection.season ? ` — ${input.collection.season}` : "")],
       ["Catégorie", input.collection.category ?? "—"],
       ["Audience cible", input.collection.targetAudience ?? "—"],
-      ["Lien public", input.test.status === "published" ? `/t/${input.test.slug}` : "non publié"],
+      ["Lien public", input.test.status === "published" ? `/s/${input.test.slug}` : "non publié"],
       ["Statut", input.test.status],
       ["Réponses", `${input.analytics.responses}`]
     ];

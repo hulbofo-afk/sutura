@@ -36,8 +36,7 @@ yarn-error.log*
 # vercel
 .vercel
 
-# Convex generated bindings
-/convex/_generated/
+# Convex generated bindings are committed: the app cannot typecheck without them.
 
 # typescript
 *.tsbuildinfo
