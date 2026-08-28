@@ -15,6 +15,7 @@ import type * as collections from "../collections.js";
 import type * as fashionTests from "../fashionTests.js";
 import type * as http from "../http.js";
 import type * as lib from "../lib.js";
+import type * as media from "../media.js";
 import type * as models from "../models.js";
 import type * as profiles from "../profiles.js";
 import type * as publicTests from "../publicTests.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   fashionTests: typeof fashionTests;
   http: typeof http;
   lib: typeof lib;
+  media: typeof media;
   models: typeof models;
   profiles: typeof profiles;
   publicTests: typeof publicTests;
