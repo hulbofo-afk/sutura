@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:validation": "node --experimental-strip-types --test tests/validation.test.ts",
+    "test:validation": "node --experimental-strip-types --test tests/*.test.ts",
     "convex:codegen": "convex codegen",
     "convex:deploy": "convex deploy"
   },

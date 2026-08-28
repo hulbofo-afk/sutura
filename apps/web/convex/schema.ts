@@ -100,6 +100,13 @@ export default defineSchema({
   })
     .index("by_test", ["testId"])
     .index("by_test_idempotency", ["testId", "idempotencyKey"]),
+  publicSubmissionLimits: defineTable({
+    testId: v.id("fashionTests"),
+    clientKey: v.string(),
+    windowStartedAt: v.number(),
+    submissionCount: v.number(),
+    updatedAt: v.number(),
+  }).index("by_test_client", ["testId", "clientKey"]),
   shareEvents: defineTable({
     testId: v.id("fashionTests"),
     channel: v.string(),

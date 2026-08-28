@@ -1,7 +1,13 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { assertOwnedCollection, requireUserId } from "./lib";
+import { validateStoredFile } from "./media";
 
 export const generateUploadUrl = mutation({ args:{}, handler:async ctx=>{await requireUserId(ctx);return ctx.storage.generateUploadUrl();} });
-export const create = mutation({args:{collectionId:v.id("collections"),name:v.string(),description:v.optional(v.string()),photoIds:v.array(v.id("_storage")),sketchId:v.optional(v.id("_storage")),videoId:v.optional(v.id("_storage")),colors:v.array(v.string()),desiredPrice:v.optional(v.number())},handler:async(ctx,args)=>{const userId=await requireUserId(ctx);await assertOwnedCollection(ctx,args.collectionId,userId);if(!args.name.trim())throw new Error("Le nom du modèle est requis.");if(!args.photoIds.length)throw new Error("Ajoutez au moins une photo.");const rows=await ctx.db.query("models").withIndex("by_collection",q=>q.eq("collectionId",args.collectionId)).collect();const now=Date.now();return ctx.db.insert("models",{...args,name:args.name.trim(),creatorId:userId,sortOrder:rows.length,createdAt:now,updatedAt:now});}});
+export const create = mutation({args:{collectionId:v.id("collections"),name:v.string(),description:v.optional(v.string()),photoIds:v.array(v.id("_storage")),sketchId:v.optional(v.id("_storage")),videoId:v.optional(v.id("_storage")),colors:v.array(v.string()),desiredPrice:v.optional(v.number())},handler:async(ctx,args)=>{const userId=await requireUserId(ctx);await assertOwnedCollection(ctx,args.collectionId,userId);if(!args.name.trim())throw new Error("Le nom du modèle est requis.");if(!args.photoIds.length)throw new Error("Ajoutez au moins une photo.");const uniqueFiles = new Set([ ...args.photoIds, ...(args.sketchId ? [args.sketchId] : []), ...(args.videoId ? [args.videoId] : []) ]);
+for (const file of uniqueFiles) {
+  const kind = args.videoId === file ? "video" : args.sketchId === file ? "sketch" : "photo";
+  await validateStoredFile(ctx, file, kind);
+}
+const rows=await ctx.db.query("models").withIndex("by_collection",q=>q.eq("collectionId",args.collectionId)).collect();const now=Date.now();return ctx.db.insert("models",{...args,name:args.name.trim(),creatorId:userId,sortOrder:rows.length,createdAt:now,updatedAt:now});}});
 export const remove = mutation({args:{id:v.id("models")},handler:async(ctx,{id})=>{const userId=await requireUserId(ctx);const model=await ctx.db.get(id);if(!model||model.creatorId!==userId)throw new Error("Modèle introuvable.");for(const file of [...model.photoIds,...(model.sketchId?[model.sketchId]:[]),...(model.videoId?[model.videoId]:[])])await ctx.storage.delete(file);await ctx.db.delete(id);}});

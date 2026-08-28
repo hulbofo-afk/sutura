@@ -31,7 +31,10 @@ function seededShuffle<T>(items: T[], seed: string) {
   return result;
 }
 
-export const submitResponse = mutation({ args: { testId: v.id("fashionTests"), answers: v.any(), startedAt: v.number(), idempotencyKey: v.string(), respondent: v.optional(v.any()) }, handler: async (ctx, args) => {
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_SUBMISSIONS = 5;
+
+export const submitResponse = mutation({ args: { testId: v.id("fashionTests"), answers: v.any(), startedAt: v.number(), idempotencyKey: v.string(), respondent: v.optional(v.any()), clientKey: v.optional(v.string()) }, handler: async (ctx, args) => {
   const test = await ctx.db.get(args.testId);
   if (!test || test.status !== "published") throw new Error("Ce test n'est plus disponible.");
   const existing = await ctx.db.query("publicResponses").withIndex("by_test_idempotency", q => q.eq("testId", args.testId).eq("idempotencyKey", args.idempotencyKey)).unique();
@@ -41,6 +44,19 @@ export const submitResponse = mutation({ args: { testId: v.id("fashionTests"), a
   if (test.settings.closesAt && test.settings.closesAt <= Date.now()) throw new Error("Ce test est terminé.");
   const questions = await ctx.db.query("questions").withIndex("by_test", q => q.eq("testId", args.testId)).collect();
   validatePublicSubmission(questions, test.settings, args.answers, args.respondent, args.idempotencyKey);
+  if (args.clientKey !== undefined) {
+    if (!/^[A-Za-z0-9_-]{16,128}$/.test(args.clientKey)) throw new Error("Identifiant de session invalide.");
+    const now = Date.now();
+    const existingLimit = await ctx.db.query("publicSubmissionLimits").withIndex("by_test_client", q => q.eq("testId", args.testId).eq("clientKey", args.clientKey!)).unique();
+    if (existingLimit && now - existingLimit.windowStartedAt < RATE_LIMIT_WINDOW_MS) {
+      if (existingLimit.submissionCount >= RATE_LIMIT_MAX_SUBMISSIONS) throw new Error("Trop de réponses depuis cette session. Réessayez plus tard.");
+      await ctx.db.patch(existingLimit._id, { submissionCount: existingLimit.submissionCount + 1, updatedAt: now });
+    } else if (existingLimit) {
+      await ctx.db.patch(existingLimit._id, { windowStartedAt: now, submissionCount: 1, updatedAt: now });
+    } else {
+      await ctx.db.insert("publicSubmissionLimits", { testId: args.testId, clientKey: args.clientKey, windowStartedAt: now, submissionCount: 1, updatedAt: now });
+    }
+  }
   const id = await ctx.db.insert("publicResponses", { testId: args.testId, answers: args.answers, startedAt: Math.min(args.startedAt, Date.now()), completedAt: Date.now(), idempotencyKey: args.idempotencyKey, respondent: args.respondent });
   return { id, message: test.settings.completionMessage ?? "Merci, ta réponse a bien été enregistrée." };
 } });
