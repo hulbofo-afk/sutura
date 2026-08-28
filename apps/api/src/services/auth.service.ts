@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import bcrypt from "bcryptjs";
 import * as crypto from "node:crypto";
 import { ConfigService } from "@nestjs/config";
-import { LoginDto, RegisterDto } from "../dto/auth.dto";
+import { LoginDto, RegisterDto, UpdateProfileDto } from "../dto/auth.dto";
 import { PrismaService } from "./prisma.service";
 import { LoginAttemptService } from "./login-attempt.service";
 import { RefreshTokenService } from "./refresh-token.service";
@@ -81,6 +81,21 @@ export class AuthService {
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException("User no longer exists");
+    return sanitizeUser(user);
+  }
+
+  async updateProfile(userId: string, input: UpdateProfileDto) {
+    const current = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!current) throw new UnauthorizedException("User no longer exists");
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: input.name?.trim(),
+        brandName: input.brandName?.trim(),
+        city: input.city?.trim() || (input.city === "" ? null : undefined),
+        country: input.country?.trim() || (input.country === "" ? null : undefined)
+      }
+    });
     return sanitizeUser(user);
   }
 

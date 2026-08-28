@@ -1,11 +1,23 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { authTables } from "@convex-dev/auth/server";
 
 const timestamps = {
   createdAt: v.number(),
   updatedAt: v.number(),
 };
+
+const collectionStatus = v.union(
+  v.literal("draft"),
+  v.literal("published"),
+  v.literal("archived"),
+);
+
+const testStatus = v.union(
+  v.literal("draft"),
+  v.literal("published"),
+  v.literal("closed"),
+);
 
 export default defineSchema({
   ...authTables,
@@ -25,9 +37,11 @@ export default defineSchema({
     category: v.optional(v.string()),
     targetAudience: v.optional(v.string()),
     launchDate: v.optional(v.string()),
-    status: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
+    status: collectionStatus,
     ...timestamps,
-  }).index("by_creator", ["creatorId"]).index("by_creator_status", ["creatorId", "status"]),
+  })
+    .index("by_creator", ["creatorId"])
+    .index("by_creator_status", ["creatorId", "status"]),
   models: defineTable({
     creatorId: v.string(),
     collectionId: v.id("collections"),
@@ -40,22 +54,30 @@ export default defineSchema({
     desiredPrice: v.optional(v.number()),
     sortOrder: v.number(),
     ...timestamps,
-  }).index("by_collection", ["collectionId"]).index("by_creator", ["creatorId"]),
+  })
+    .index("by_collection", ["collectionId"])
+    .index("by_creator", ["creatorId"]),
   fashionTests: defineTable({
     creatorId: v.string(),
     collectionId: v.id("collections"),
     slug: v.string(),
     title: v.string(),
     description: v.optional(v.string()),
-    status: v.union(v.literal("draft"), v.literal("published"), v.literal("closed")),
+    status: testStatus,
     settings: v.object({
       maxResponses: v.optional(v.number()),
       closesAt: v.optional(v.number()),
       anonymousResponses: v.boolean(),
-      collectRespondentProfile: v.boolean(),
+      collectRespondentProfile: v.union(v.boolean(), v.array(v.string())),
+      randomizeQuestions: v.optional(v.boolean()),
+      requireAllQuestions: v.optional(v.boolean()),
+      completionMessage: v.optional(v.string()),
     }),
     ...timestamps,
-  }).index("by_slug", ["slug"]).index("by_creator", ["creatorId"]).index("by_collection", ["collectionId"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_creator", ["creatorId"])
+    .index("by_collection", ["collectionId"]),
   questions: defineTable({
     testId: v.id("fashionTests"),
     modelId: v.optional(v.id("models")),
@@ -75,10 +97,28 @@ export default defineSchema({
     startedAt: v.number(),
     completedAt: v.number(),
     idempotencyKey: v.optional(v.string()),
-  }).index("by_test", ["testId"]).index("by_test_idempotency", ["testId", "idempotencyKey"]),
+  })
+    .index("by_test", ["testId"])
+    .index("by_test_idempotency", ["testId", "idempotencyKey"]),
   shareEvents: defineTable({
     testId: v.id("fashionTests"),
     channel: v.string(),
     createdAt: v.number(),
   }).index("by_test", ["testId"]),
+  recommendationCache: defineTable({
+    testId: v.id("fashionTests"),
+    creatorId: v.string(),
+    responseCount: v.number(),
+    provider: v.union(v.literal("local"), v.literal("imole")),
+    dataPolicy: v.string(),
+    recommendations: v.array(v.object({
+      priority: v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+      category: v.union(v.literal("production"), v.literal("pricing"), v.literal("audience"), v.literal("content"), v.literal("risk")),
+      message: v.string(),
+      rationale: v.optional(v.string()),
+    })),
+    generatedAt: v.number(),
+  })
+    .index("by_test", ["testId"])
+    .index("by_creator", ["creatorId"]),
 });

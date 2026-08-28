@@ -1,6 +1,8 @@
-# Sutura — Plan Version Web (Frontend) — exploitation du backend récupéré
+# Sutura — Plan Version Web (historique)
 
-> Backend source: `/home/hopeman/labs/sutura/apps/api` (NestJS 11 + Prisma 7.8 + Postgres, récupéré via rescue VPS 164.132.196.41 du 06/08)
+> **Document historique — ne décrit plus l’architecture active.** Depuis le 28 août 2026, le frontend utilise Convex comme backend applicatif. Voir `README.md` et `HANDOFF.md` pour la vision actuelle.
+>
+> Ce plan conserve le contexte de la première implémentation basée sur `/apps/api` (NestJS 11 + Prisma 7.8 + PostgreSQL) et ne doit pas servir de contrat pour les nouvelles fonctionnalités.
 > Objectif: scaffold `apps/web` — version web créateur + page publique testeur, en réutilisant le contrat `API_CONTRACT.md`
 
 ## 1. Inventaire backend récupéré (fonctionnel)

@@ -2,39 +2,161 @@
 
 :root {
   --framboise: #e90046;
+  --framboise-fonce: #c9003d;
+  --framboise-douce: #f2709b;
   --jaune: #f5d500;
+  --jaune-clair: #fef7cd;
   --prune: #4a2630;
+  --prune-doux: #6f4653;
   --rose-pale: #fce8eb;
+  --rose-clair: #fdf3f5;
   --noir: #101418;
   --canvas: #fffcfd;
   --surface: #ffffff;
   --line: #ebdde1;
   --success: #2f7655;
+  --success-clair: #e3f2ea;
+  --error: #b33a35;
+  --error-clair: #fae9e7;
 }
 
 @theme inline {
   --color-framboise: var(--framboise);
+  --color-framboise-fonce: var(--framboise-fonce);
+  --color-framboise-douce: var(--framboise-douce);
   --color-jaune: var(--jaune);
+  --color-jaune-clair: var(--jaune-clair);
   --color-prune: var(--prune);
+  --color-prune-doux: var(--prune-doux);
   --color-rose-pale: var(--rose-pale);
+  --color-rose-clair: var(--rose-clair);
   --color-noir: var(--noir);
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-line: var(--line);
+  --color-success: var(--success);
+  --color-success-clair: var(--success-clair);
+  --color-error: var(--error);
+  --color-error-clair: var(--error-clair);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
 }
 
 * { box-sizing: border-box; }
-html { background: var(--canvas); }
+html { background: var(--canvas); scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--canvas);
   color: var(--noir);
   font-family: var(--font-body), sans-serif;
+  text-rendering: optimizeLegibility;
 }
 
 button, a { -webkit-tap-highlight-color: transparent; }
 button { cursor: pointer; }
 
+::selection { background: var(--rose-pale); color: var(--prune); }
+
+/* Focus visible cohérent sur toute l'app */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--framboise);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .display-font { font-family: var(--font-display), serif; }
+
+/* ————— Hiérarchie typographique fluide (zéro débordement mobile) ————— */
+.t-display-xl { font-family: var(--font-display), serif; font-size: clamp(2.75rem, 3.5vw + 1.9rem, 5.75rem); line-height: 0.94; letter-spacing: -0.03em; font-weight: 600; }
+.t-display-lg { font-family: var(--font-display), serif; font-size: clamp(2.35rem, 2.6vw + 1.6rem, 3.9rem); line-height: 0.97; letter-spacing: -0.02em; font-weight: 600; }
+.t-display-md { font-family: var(--font-display), serif; font-size: clamp(1.9rem, 2vw + 1.2rem, 2.9rem); line-height: 1; letter-spacing: -0.015em; font-weight: 600; }
+.t-display-sm { font-family: var(--font-display), serif; font-size: clamp(1.45rem, 1.4vw + 1rem, 1.9rem); line-height: 1.05; font-weight: 600; }
+.t-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+
+/* ————— Surfaces & ombres signature ————— */
+.shadow-lift { box-shadow: 0 18px 50px rgba(74, 38, 48, 0.08); }
+.shadow-lift-lg { box-shadow: 0 24px 60px rgba(74, 38, 48, 0.16); }
+.shadow-framboise { box-shadow: 0 12px 24px rgba(233, 0, 70, 0.18); }
+.card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+.card-hover:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(74, 38, 48, 0.1); }
+
+/* ————— Motion ————— */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.anim-rise { animation: rise 0.6s cubic-bezier(0.22, 0.9, 0.32, 1) both; }
+.anim-fade { animation: fade-in 0.5s ease both; }
+.anim-step { animation: step-in 0.35s cubic-bezier(0.22, 0.9, 0.32, 1) both; }
+.anim-pop { animation: pop 0.5s cubic-bezier(0.22, 0.9, 0.32, 1) both; }
+.anim-float { animation: float-soft 6s ease-in-out infinite; }
+.anim-bar { transform-origin: bottom; animation: bar-grow 0.8s cubic-bezier(0.22, 0.9, 0.32, 1) both; }
+.delay-1 { animation-delay: 0.08s; }
+.delay-2 { animation-delay: 0.16s; }
+.delay-3 { animation-delay: 0.24s; }
+.delay-4 { animation-delay: 0.32s; }
+.delay-5 { animation-delay: 0.4s; }
+
+/* ————— Skeletons ————— */
+.skeleton {
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--rose-clair) 25%, var(--rose-pale) 45%, var(--rose-clair) 65%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* ————— Texture fil de couture (signature textile) ————— */
+.stitch-line {
+  background-image: linear-gradient(90deg, var(--line) 55%, transparent 45%);
+  background-size: 14px 1px;
+  background-repeat: repeat-x;
+  height: 1px;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(74, 38, 48, 0.05) 1px, transparent 1px);
+  background-size: 5px 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
